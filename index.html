@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yacine TV - نسخة الويب</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1117; --bg2:#171a23; --bg3:#1f2330; --line:#2a2f3d;
+    --txt:#e8eaf0; --dim:#9aa0b4; --acc:#e94560; --acc2:#533483;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',Tahoma,Arial,sans-serif;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+  .logo{font-size:20px;font-weight:800;color:var(--acc);white-space:nowrap}
+  .logo span{color:var(--txt)}
+  .search{flex:1;max-width:420px;margin-inline-start:auto}
+  .search input{width:100%;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:var(--bg3);color:var(--txt);outline:none}
+  .search input:focus{border-color:var(--acc)}
+  .icon-btn{background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:15px}
+  .icon-btn:hover{border-color:var(--acc)}
+  .layout{display:flex;flex:1;min-height:0}
+  aside{width:250px;background:var(--bg2);border-inline-end:1px solid var(--line);padding:10px;overflow-y:auto;flex-shrink:0;transition:transform .25s;min-height:0}
+  aside h3{font-size:12px;color:var(--dim);margin:6px 4px 10px;text-transform:uppercase}
+  .cat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;color:var(--txt);font-size:14px}
+  .cat-item:hover{background:var(--bg3)}
+  .cat-item.active{background:var(--acc2);color:#fff}
+  .cat-item img{width:26px;height:26px;border-radius:6px;object-fit:contain;background:#0006}
+  .cat-item .cnt{margin-inline-start:auto;font-size:11px;color:var(--dim);background:#0006;padding:2px 8px;border-radius:10px}
+  main{flex:1;padding:16px;overflow-y:auto;min-height:0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s}
+  .card:hover{border-color:var(--acc);transform:translateY(-2px)}
+  .card img{width:64px;height:64px;object-fit:contain;border-radius:12px;background:#0006;margin-bottom:10px}
+  .card .ph{width:64px;height:64px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 10px}
+  .card .name{font-size:13px;font-weight:600;line-height:1.4;word-break:break-word}
+  .card .sub{font-size:11px;color:var(--dim);margin-top:4px}
+  .section-title{font-size:16px;font-weight:700;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
+  .crumb{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--dim);margin-bottom:14px;flex-wrap:wrap}
+  .crumb a{color:var(--acc);cursor:pointer;text-decoration:none}
+  .empty{color:var(--dim);text-align:center;padding:60px 0;font-size:15px}
+  .spin{display:flex;justify-content:center;padding:60px}
+  .spin::after{content:'';width:42px;height:42px;border:4px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 0.8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* player */
+  #playerView{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column;overscroll-behavior:none}
+  #playerView.open{display:flex}
+  .pv-top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#000c;flex-shrink:0}
+  .pv-title{flex:1;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  video{flex:1;width:100%;min-height:0;background:#000;outline:none;object-fit:contain}
+  .pv-bar{display:flex;gap:8px;padding:10px 14px;background:#000d;overflow-x:auto;align-items:center;flex-shrink:0;-webkit-overflow-scrolling:touch}
+  .pv-bar button{background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;white-space:nowrap}
+  .pv-bar button.on{background:var(--acc);border-color:var(--acc)}
+  .err{color:#ff8080;font-size:13px;padding:8px 14px;display:none}
+  /* settings drawer */
+  #drawer{position:fixed;top:0;inset-inline-start:0;width:320px;height:100%;background:var(--bg2);border-inline-end:1px solid var(--line);z-index:200;transform:translateX(100%);transition:.25s;padding:20px;overflow-y:auto}
+  [dir=rtl] #drawer{transform:translateX(-100%)}
+  #drawer.open{transform:translateX(0)!important}
+  #drawer h2{font-size:17px;margin-bottom:16px}
+  #drawer label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px}
+  #drawer input[type=text],#drawer input[type=file]{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg3);color:var(--txt)}
+  #drawer .hint{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.6}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line);padding:10px 20px;border-radius:10px;font-size:14px;z-index:300;display:none}
+  @media(max-width:800px){
+    aside{position:fixed;top:53px;bottom:0;inset-inline-start:0;z-index:150;width:280px;transform:translateX(100%);box-shadow:0 0 30px #000a}
+    aside.open{transform:translateX(0)!important}
+    .cat-btn{display:inline-flex!important}
+  }
+  .cat-btn{display:none;background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:15px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Yacine<span>TV</span></div>
+  <button class="icon-btn cat-btn" id="btnCats" title="التصنيفات">☰</button>
+  <div class="search"><input id="searchInput" placeholder="ابحث عن قناة أو حدث..."></div>
+  <button class="icon-btn" id="btnEvents" title="المباريات">⚽</button>
+  <button class="icon-btn" id="btnSettings" title="الإعدادات">⚙️</button>
+</header>
+<div class="layout">
+  <aside id="sidebar">
+    <h3>التصنيفات</h3>
+    <div id="cats"><div class="spin"></div></div>
+  </aside>
+  <main id="main"><div class="empty">جارٍ التحميل...</div></main>
+</div>
+
+<div id="drawer">
+  <h2>الإعدادات</h2>
+  <label>رابط الـ API (نفس رابط التطبيق)</label>
+  <input type="text" id="apiBase" dir="ltr">
+  <div class="hint">الصيغة: https://example.com/api/ — يجب أن ينتهي بـ /</div>
+  <label>بروكسي CORS (اختياري — إذا حظرت المتصفحات الطلب)</label>
+  <input type="text" id="proxy" dir="ltr" placeholder="مثال: https://api.allorigins.win/raw?url=">
+  <div class="hint">الصيغة: بادئة تلتصق برابط الـ API كاملاً</div>
+  <label>تحميل قائمة M3U خارجية (بديل كامل)</label>
+  <input type="text" id="m3uUrl" dir="ltr" placeholder="https://.../list.m3u">
+  <button class="icon-btn" id="btnLoadM3u" style="margin-top:10px;width:100%">تحميل القائمة</button>
+  <label style="margin-top:16px">أو ملف M3U من جهازك</label>
+  <input type="file" id="m3uFile" accept=".m3u,.m3u8,.txt">
+  <div class="hint" id="m3uStatus"></div>
+</div>
+
+<div id="playerView">
+  <div class="pv-top">
+    <button class="icon-btn" id="pvBack">→ رجوع</button>
+    <div class="pv-title" id="pvTitle"></div>
+    <button class="icon-btn" id="pvExternal" title="فتح خارجي">🔗</button>
+  </div>
+  <video id="video" controls autoplay playsinline webkit-playsinline></video>
+  <div class="err" id="pvErr"></div>
+  <div class="pv-bar" id="pvBar"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================== الإعدادات ================== */
+const DEFAULT_API = "/api/"; // same-origin -> app.js decrypt proxy (port 8891)
+const LS = {
+  get(k,d){ try{ return localStorage.getItem(k) ?? d }catch(e){ return d } },
+  set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
+};
+let API_BASE = LS.get("yt_api", DEFAULT_API);
+let PROXY = LS.get("yt_proxy", "");
+let hls = null;
+
+function api(path){
+  let url = API_BASE.replace(/\/?$/, "/") + path;
+  return PROXY ? PROXY + encodeURIComponent(url) : url;
+}
+async function jget(path){
+  const r = await fetch(api(path), {headers:{Accept:"application/json"}});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
+}
+function toast(msg, ms=2500){
+  const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block";
+  clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none", ms);
+}
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+function imgTag(url, cls){
+  if(!url) return `<div class="ph">📺</div>`;
+  return `<img src="${esc(url)}" loading="lazy" onerror="this.outerHTML='<div class=ph>📺</div>'">`;
+}
+
+/* ================== التصنيفات ================== */
+const state = { cats:[], eventsMode:false, m3u:null };
+
+async function loadCategories(){
+  const box=document.getElementById("cats");
+  box.innerHTML='<div class="spin"></div>';
+  try{
+    const res = await jget("categories");
+    const data = res?.data ?? res?.body?.data ?? [];
+    state.cats = Array.isArray(data)?data:[];
+    renderCats();
+  }catch(e){
+    box.innerHTML = `<div class="empty" style="padding:20px;font-size:13px">تعذر تحميل التصنيفات<br><small>${esc(e.message)}</small></div>`;
+  }
+}
+function renderCats(){
+  const box=document.getElementById("cats");
+  box.innerHTML = state.cats.map(c=>`
+    <div class="cat-item" data-id="${c.id}" data-name="${esc(c.name)}">
+      ${c.logo?`<img src="${esc(c.logo)}" onerror="this.style.display='none'">`:`<span>📁</span>`}
+      <span>${esc(c.name)}</span>
+      ${c.child_count?`<span class="cnt">${c.child_count}</span>`:""}
+    </div>`).join("");
+  box.querySelectorAll(".cat-item").forEach(el=>{
+    el.onclick=()=>openCategory(el.dataset.id, el.dataset.name, el);
+  });
+}
+
+async function openCategory(id, name, el){
+  document.querySelectorAll(".cat-item").forEach(x=>x.classList.remove("active"));
+  el?.classList.add("active");
+  state.eventsMode=false;
+  const main=document.getElementById("main");
+  main.innerHTML=`<div class="crumb"><a data-go="home">الرئيسية</a> / ${esc(name)}</div><div class="spin"></div>`;
+  main.querySelector("[data-go=home]").onclick=()=>{el?.classList.remove("active");showHome();};
+  try{
+    const [subRes, chRes] = await Promise.all([
+      jget(`categories/${id}`).catch(()=>null),
+      jget(`categories/${id}/channels`).catch(()=>null)
+    ]);
+    const subs = subRes?.data?.data ?? subRes?.data ?? [];
+    const chans = chRes?.data ?? [];
+    let html = `<div class="crumb"><a data-go="home">الرئيسية</a> / ${esc(name)}</div>`;
+    if(Array.isArray(subs)&&subs.length){
+      html += `<div class="section-title">التصنيفات الفرعية</div><div class="grid">`+
+        subs.map(c=>`<div class="card" data-cat="${c.id}" data-name="${esc(c.name)}">${imgTag(c.logo)}<div class="name">${esc(c.name)}</div></div>`).join("")+
+        `</div>`;
+    }
+    if(Array.isArray(chans)&&chans.length){
+      html += `<div class="section-title">القنوات (${chans.length})</div><div class="grid">`+
+        chans.map(c=>`<div class="card" data-ch="${c.id}">${imgTag(c.logo)}<div class="name">${esc(c.name)}</div></div>`).join("")+
+        `</div>`;
+    }
+    if(!subs.length&&!chans.length) html+=`<div class="empty">لا يوجد محتوى في هذا التصنيف</div>`;
+    main.innerHTML=html;
+    main.querySelector("[data-go=home]")?.addEventListener("click",()=>{el?.classList.remove("active");showHome();});
+    main.querySelectorAll("[data-cat]").forEach(x=>x.onclick=()=>openCategory(x.dataset.cat,x.dataset.name,null));
+    main.querySelectorAll("[data-ch]").forEach(x=>x.onclick=()=>openChannel(x.dataset.ch));
+  }catch(e){
+    main.innerHTML=`<div class="empty">خطأ: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ================== الرئيسية ================== */
+function showHome(){
+  state.eventsMode=false;
+  const main=document.getElementById("main");
+  if(state.m3u){ renderM3u(); return; }
+  main.innerHTML=`<div class="section-title">اختر تصنيفاً من القائمة</div>
+    <div class="empty">التصنيفات على اليمين — اختر واحداً لعرض القنوات</div>`;
+}
+
+/* ================== القنوات والبث ================== */
+async function openChannel(id){
+  const main=document.getElementById("main");
+  main.innerHTML='<div class="spin"></div>';
+  try{
+    const res = await jget(`channel/${id}`);
+    const body = res?.data ?? res;
+    let streams = Array.isArray(body) ? body : (body?.data ?? []);
+    const servers = res?.servers ?? body?.servers ?? {};
+    // لو data فاضي و servers فيه روابط، استخدمها كبديل
+    if((!streams||!streams.length)&&servers&&typeof servers==="object"){
+      streams=[];
+      for(const [sname,arr] of Object.entries(servers)){
+        (Array.isArray(arr)?arr:[]).forEach(u=>{
+          if(typeof u==="string"&&/^https?:/.test(u)) streams.push({name:sname,url:u,user_agent:"",headers:{},url_type:1});
+        });
+      }
+    }
+    if(!streams||!streams.length){ main.innerHTML='<div class="empty">لا توجد روابط بث لهذه القناة</div>'; return; }
+    renderStreams(streams, `channel-${id}`, "قناة");
+  }catch(e){ main.innerHTML=`<div class="empty">خطأ: ${esc(e.message)}</div>`; }
+}
+
+function renderStreams(streams, key, label){
+  const main=document.getElementById("main");
+  main.innerHTML=`<div class="section-title">السيرفرات المتاحة (${streams.length})</div>
+    <div class="grid">`+streams.map((s,i)=>`
+      <div class="card" data-i="${i}">
+        <div class="ph">📡</div>
+        <div class="name">${esc(s.name||("سيرفر "+(i+1)))}</div>
+        <div class="sub">${esc((s.url||"").slice(0,40))}</div>
+      </div>`).join("")+`</div>`;
+  main.querySelectorAll("[data-i]").forEach(el=>{
+    el.onclick=()=>playStream(streams[+el.dataset.i], streams, label+" — "+(streams[+el.dataset.i].name||""));
+  });
+}
+
+/* ================== المباريات ================== */
+async function loadEvents(){
+  state.eventsMode=true;
+  const main=document.getElementById("main");
+  main.innerHTML='<div class="spin"></div>';
+  try{
+    const res=await jget("events");
+    const events=res?.data?.data ?? res?.data ?? [];
+    if(!events.length){main.innerHTML='<div class="empty">لا توجد مباريات حالياً</div>';return;}
+    main.innerHTML=`<div class="section-title">المباريات (${events.length})</div><div class="grid">`+
+      events.map(ev=>{
+        const t1=ev.team_1?.name||ev.team_1||"؟", t2=ev.team_2?.name||ev.team_2||"؟";
+        const l1=ev.team_1?.logo||"", l2=ev.team_2?.logo||"";
+        const st=ev.start_time?new Date(ev.start_time*1000).toLocaleString("ar"):"";
+        return `<div class="card" data-ev="${ev.id}">
+          <div style="display:flex;justify-content:center;gap:10px;align-items:center;margin-bottom:8px">
+            ${l1?`<img src="${esc(l1)}" style="width:40px;height:40px;object-fit:contain">`:`<div class="ph" style="width:40px;height:40px;font-size:18px;margin:0">⚽</div>`}
+            <b style="font-size:12px">VS</b>
+            ${l2?`<img src="${esc(l2)}" style="width:40px;height:40px;object-fit:contain">`:`<div class="ph" style="width:40px;height:40px;font-size:18px;margin:0">⚽</div>`}
+          </div>
+          <div class="name">${esc(t1)} × ${esc(t2)}</div>
+          <div class="sub">${esc(st)}</div>
+        </div>`;
+      }).join("")+`</div>`;
+    main.querySelectorAll("[data-ev]").forEach(el=>el.onclick=()=>openEvent(el.dataset.ev));
+  }catch(e){main.innerHTML=`<div class="empty">خطأ: ${esc(e.message)}</div>`;}
+}
+async function openEvent(id){
+  const main=document.getElementById("main");
+  main.innerHTML='<div class="spin"></div>';
+  try{
+    const res=await jget(`event/${id}`);
+    const body=res?.data??res;
+    const streams=Array.isArray(body)?body:(body?.data??[]);
+    if(!streams.length){main.innerHTML='<div class="empty">لا توجد روابط لهذه المباراة</div>';return;}
+    renderStreams(streams,`event-${id}`,"مباراة");
+  }catch(e){main.innerHTML=`<div class="empty">خطأ: ${esc(e.message)}</div>`;}
+}
+
+/* ================== البحث ================== */
+let searchTimer=null;
+document.getElementById("searchInput").addEventListener("input",e=>{
+  clearTimeout(searchTimer);
+  const q=e.target.value.trim();
+  if(!q){showHome();return;}
+  searchTimer=setTimeout(async()=>{
+    const main=document.getElementById("main");
+    main.innerHTML='<div class="spin"></div>';
+    try{
+      const res=await jget(`search?query=${encodeURIComponent(q)}`);
+      const chans=res?.data?.data??res?.data??[];
+      if(!chans.length){main.innerHTML='<div class="empty">لا نتائج</div>';return;}
+      main.innerHTML=`<div class="section-title">نتائج البحث (${chans.length})</div><div class="grid">`+
+        chans.map(c=>`<div class="card" data-ch="${c.id}">${imgTag(c.logo)}<div class="name">${esc(c.name)}</div></div>`).join("")+`</div>`;
+      main.querySelectorAll("[data-ch]").forEach(x=>x.onclick=()=>openChannel(x.dataset.ch));
+    }catch(err){main.innerHTML=`<div class="empty">خطأ: ${esc(err.message)}</div>`;}
+  },400);
+});
+
+/* ================== قائمة M3U خارجية ================== */
+function parseM3u(text){
+  const lines=text.split(/\r?\n/); const groups=[]; let cur={name:"عام",channels:[]};
+  for(const raw of lines){
+    const line=raw.trim(); if(!line) continue;
+    if(line.startsWith("#EXTINF")){
+      const m=line.match(/,(.*)$/); const name=m?m[1].trim():"قناة";
+      cur.channels.push({name});
+    }else if(line.startsWith("#EXTGRP:")){ cur.name=line.slice(8); }
+    else if(line.startsWith("#")){}
+    else if(/^https?:/i.test(line)){
+      const last=cur.channels[cur.channels.length-1];
+      if(last){ last.url=line; } else { cur.channels.push({name:"قناة",url:line}); }
+    }
+  }
+  // إعادة تجميع المجموعات
+  const res=[]; let gname="عام", items=[];
+  for(const raw of lines){
+    const line=raw.trim();
+    if(line.startsWith("#EXTGRP:")){ if(items.length)res.push({name:gname,channels:items}); gname=line.slice(8); items=[]; }
+    else if(line.startsWith("#EXTINF")){
+      const m=line.match(/,(.*)$/); const name=m?m[1].trim():"قناة"; items.push({name,url:null});
+    }else if(/^https?:/i.test(line)){
+      const last=items[items.length-1]; if(last&&!last.url) last.url=line;
+    }
+  }
+  if(items.length)res.push({name:gname,channels:items});
+  return res.filter(g=>g.channels.length);
+}
+function flattenM3u(groups){
+  const out=[];
+  groups.forEach(g=>g.channels.forEach(c=>{ if(c.url) out.push({name:g.name+" — "+c.name, url:c.url}); }));
+  return out;
+}
+function renderM3u(){
+  const main=document.getElementById("main");
+  const groups=state.m3u;
+  main.innerHTML=`<div class="section-title">قائمة M3U (${flattenM3u(groups).length} قناة)</div>
+    <div class="grid">`+groups.map((g,gi)=>`
+      <div class="card" data-g="${gi}">
+        <div class="ph">📁</div>
+        <div class="name">${esc(g.name)}</div>
+        <div class="sub">${g.channels.length} قناة</div>
+      </div>`).join("")+`</div>`;
+  main.querySelectorAll("[data-g]").forEach(el=>el.onclick=()=>{
+    const g=groups[+el.dataset.g];
+    main.innerHTML=`<div class="crumb"><a data-back>رجوع</a> / ${esc(g.name)}</div>
+      <div class="grid">`+g.channels.filter(c=>c.url).map((c,i)=>`
+        <div class="card" data-u="${esc(c.url)}"><div class="ph">📺</div><div class="name">${esc(c.name)}</div></div>`).join("")+`</div>`;
+    main.querySelector("[data-back]").onclick=renderM3u;
+    main.querySelectorAll("[data-u]").forEach(x=>x.onclick=()=>{
+      const streams=[{name:x.querySelector(".name").textContent,url:x.dataset.u,user_agent:"",headers:{},url_type:1}];
+      playStream(streams[0],streams,"m3u");
+    });
+  });
+}
+async function loadM3uFromUrl(url){
+  document.getElementById("m3uStatus").textContent="جارٍ التحميل...";
+  try{
+    const txt=await (await fetch(url)).text();
+    state.m3u=parseM3u(txt); LS.set("yt_m3u",url);
+    document.getElementById("m3uStatus").textContent=`تم: ${flattenM3u(state.m3u).length} قناة`;
+    document.querySelectorAll(".cat-item").forEach(x=>x.classList.remove("active"));
+    showHome();
+  }catch(e){ document.getElementById("m3uStatus").textContent="فشل: "+e.message; }
+}
+
+/* ================== المشغل ================== */
+const pv=document.getElementById("playerView"), video=document.getElementById("video"),
+      pvBar=document.getElementById("pvBar"), pvErr=document.getElementById("pvErr");
+let currentStreams=[], currentIdx=0;
+
+function destroyHls(){ if(hls){hls.destroy();hls=null;} video.removeAttribute("src"); video.load(); }
+
+async function resolveUrl(stream){
+  let url=stream.url;
+  // نفس منطق التطبيق: روابط twitter + stream_name تُحل عبر tw_key
+  if(/twitter/i.test(url||"")){
+    try{
+      const u=new URL(url); const sn=u.searchParams.get("stream_name");
+      if(sn){
+        const r=await fetch(api(`tw_key?stream_name=${encodeURIComponent(sn)}`));
+        if(r.ok){ const t=await r.text(); if(t.trim()) url=t.trim().replace(/^"|"$/g,""); }
+      }
+    }catch(e){}
+  }
+  return url;
+}
+
+async function playStream(stream, streams, title){
+  drawer.classList.remove("open");
+  sidebar.classList.remove("open");
+  currentStreams=streams||[stream]; currentIdx=currentStreams.indexOf(stream);
+  if(currentIdx<0)currentIdx=0;
+  const type=stream.url_type??1;
+  document.getElementById("pvTitle").textContent=title||stream.name||"";
+  document.getElementById("pvExternal").onclick=()=>window.open(stream.url,"_blank");
+  pvErr.style.display="none";
+  // بناء شريط السيرفرات
+  pvBar.innerHTML=currentStreams.map((s,i)=>`<button data-i="${i}" class="${i===currentIdx?'on':''}">${esc(s.name||("س"+(i+1)))}</button>`).join("");
+  pvBar.querySelectorAll("button").forEach(b=>b.onclick=()=>playStream(currentStreams[+b.dataset.i],currentStreams,title));
+  pv.classList.add("open");
+  if(type===4){ // YouTube
+    destroyHls();
+    const vid=(stream.url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{6,})/)||[])[1]||"";
+    video.style.display="none";
+    let yt=document.getElementById("ytFrame");
+    if(!yt){yt=document.createElement("iframe");yt.id="ytFrame";yt.style.cssText="flex:1;width:100%;border:0;background:#000";yt.allow="autoplay;fullscreen";yt.allowFullscreen=true;video.parentNode.insertBefore(yt,video.nextSibling);}
+    yt.src=`https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
+    yt.style.display="block";
+    return;
+  }
+  const yt=document.getElementById("ytFrame"); if(yt){yt.style.display="none";yt.src="about:blank";}
+  video.style.display="block";
+  destroyHls();
+  const url=await resolveUrl(stream);
+  const headers=stream.headers||{};
+  const isHls=/\.m3u8($|\?)/i.test(url)||/m3u8/i.test(url);
+  const canHls=window.Hls&&Hls.isSupported();
+  const murl=mediaUrl(url,stream);
+  const nativeHls = !!video.canPlayType('application/vnd.apple.mpegurl');
+  if(isHls&&nativeHls){
+    // تشغيل أصلي — أفضل على الجوال (Safari/iOS/Android)
+    video.src=murl;
+    video.addEventListener("error",()=>{pvErr.textContent="تعذر تشغيل الرابط";pvErr.style.display="block";},{once:true});
+    video.play().catch(()=>{});
+  }else if(isHls&&canHls){
+    hls=new Hls({xhrSetup:(xhr,u2)=>{ for(const[k,v]of Object.entries(headers)) try{xhr.setRequestHeader(k,v)}catch(e){} },
+                  manifestLoadingTimeOut:20000,levelLoadingTimeOut:20000});
+    hls.loadSource(murl); hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play().catch(()=>{}));
+    hls.on(Hls.Events.ERROR,(e,d)=>{ if(d.fatal){pvErr.textContent="خطأ في البث: "+(d.details||d.type);pvErr.style.display="block";} });
+  }else{
+    video.src=murl;
+    video.addEventListener("error",()=>{pvErr.textContent="تعذر تشغيل الرابط";pvErr.style.display="block";},{once:true});
+    video.play().catch(()=>{});
+  }
+}
+function mediaUrl(url,stream){
+  const p=new URLSearchParams(); p.set('url',url);
+  if(stream&&stream.user_agent)p.set('ua',stream.user_agent);
+  const h=(stream&&stream.headers)||{};
+  if(Object.keys(h).length)p.set('headers',JSON.stringify(h));
+  return '/media?'+p.toString();
+}
+document.getElementById("pvBack").onclick=()=>{pv.classList.remove("open");destroyHls();};
+
+/* ================== الإعدادات ================== */
+const drawer=document.getElementById("drawer");
+const sidebar=document.getElementById("sidebar");
+document.getElementById("btnCats").onclick=()=>sidebar.classList.toggle("open");
+// إغلاق الشريط الجانبي عند اختيار تصنيف على الجوال
+document.getElementById("cats").addEventListener("click",e=>{
+  if(e.target.closest(".cat-item")) setTimeout(()=>sidebar.classList.remove("open"),300);
+});
+document.getElementById("btnSettings").onclick=()=>{
+  document.getElementById("apiBase").value=API_BASE;
+  document.getElementById("proxy").value=PROXY;
+  document.getElementById("m3uUrl").value=LS.get("yt_m3u","");
+  drawer.classList.toggle("open");
+};
+document.getElementById("btnEvents").onclick=()=>{document.querySelectorAll(".cat-item").forEach(x=>x.classList.remove("active"));loadEvents();};
+document.getElementById("btnLoadM3u").onclick=()=>{
+  const u=document.getElementById("m3uUrl").value.trim();
+  if(u) loadM3uFromUrl(u);
+};
+document.getElementById("m3uFile").onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{ state.m3u=parseM3u(rd.result); LS.set("yt_m3u","local");
+    document.getElementById("m3uStatus").textContent=`تم: ${flattenM3u(state.m3u).length} قناة`;
+    document.querySelectorAll(".cat-item").forEach(x=>x.classList.remove("active"));
+    drawer.classList.remove("open"); showHome(); };
+  rd.readAsText(f);
+};
+document.getElementById("apiBase").onchange=e=>{API_BASE=e.target.value.trim()||DEFAULT_API;LS.set("yt_api",API_BASE);loadCategories();toast("تم حفظ رابط الـ API");};
+document.getElementById("proxy").onchange=e=>{PROXY=e.target.value.trim();LS.set("yt_proxy",PROXY);loadCategories();toast("تم حفظ البروكسي");};
+
+/* ================== تشغيل أولي ================== */
+(async function init(){
+  const savedM3u=LS.get("yt_m3u","");
+  if(savedM3u && savedM3u!=="local"){
+    try{
+      const txt=await (await fetch(savedM3u)).text();
+      state.m3u=parseM3u(txt); showHome();
+      document.getElementById("cats").innerHTML='<div class="empty" style="padding:20px;font-size:13px">قائمة M3U محملة<br><a id="backApi" style="color:var(--acc);cursor:pointer">العودة للـ API</a></div>';
+      document.getElementById("backApi").onclick=()=>{state.m3u=null;LS.set("yt_m3u","");loadCategories();showHome();};
+      return;
+    }catch(e){}
+  }
+  loadCategories();
+  showHome();
+})();
+</script>
+</body>
+</html>
