@@ -1,0 +1,7 @@
+<LA_URL>https://x</LA_URL>
+http://
+Ahttp://schemas.microsoft.com/DRM/2007/03/protocols/AcquireLicense
+?https://docs.google.com/spreadsheet/formResponse?formkey=%s&ifq
+0https://github.com/L-JINBIN/ApkSignatureKillerEx
+Ahttps://pagead2.googlesyndication.com/pagead/gen_204?id=gmob-apps
+https://x

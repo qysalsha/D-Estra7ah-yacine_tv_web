@@ -1,0 +1,107 @@
+* https://googlemobileadssdk.page.link/admob-android-update-manifest         *
+* https://googlemobileadssdk.page.link/ad-manager-android-update-manifest.   *
+|   https://support.start.io/hc/en-us/articles/360014774799   |
+splash_imageUrl = "https://lh6.ggpht.com/Vo9wbFH89BbDbWFhUezQZOGPKmfkJSAtIbVWk3QxPbvJwcR8I79EVuI0aB41a-je7x-6=w200";
+See https://developer.android.com/guide/topics/media/issues/player-accessed-on-wrong-thread
+@, see https://developers.google.com/tink/faq/registration_errors
+Animate.css - https://daneden.me/animate
+Licensed under the MIT license - https://opensource.org/licenses/MIT
+Ad inspector cannot be opened because the device is not in test mode. See https://developers.google.com/admob/android/test-ads#enable_test_devices for more information.
+Analytics service at risk of not starting. For more reliable analytics, add the WAKE_LOCK permission to your manifest. See http://goo.gl/8Rd3yj for instructions.
+AnalyticsReceiver is not registered or is disabled. Register the receiver for reliable dispatching on non-Google Play devices. See http://goo.gl/8Rd3yj for instructions.
+AnalyticsService is not registered or is disabled. Analytics service at risk of not starting. See http://goo.gl/8Rd3yj for instructions.
+AnalyticsService not registered in the app manifest. Hits might not be delivered reliably. See http://goo.gl/8Rd3yj for instructions.
+App measurement deactivated via resources. This method is being deprecated. Please refer to https://firebase.google.com/support/guides/disable-analytics
+CampaignTrackingReceiver is not registered, not exported or is disabled. Installation campaign tracking is not possible. See http://goo.gl/8Rd3yj for instructions.
+yCleartext HTTP traffic not permitted. See https://developer.android.com/guide/topics/media/issues/cleartext-not-permitted
+^Cleartext HTTP traffic not permitted. See https://exoplayer.dev/issues/cleartext-not-permitted
+pDeferring to Google Analytics for Firebase for event data collection. https://firebase.google.com/docs/analytics
+aHit delivery not possible. Missing network permissions. See http://goo.gl/8Rd3yj for instructions
+IllegalStateException getting Ad Id Info. If you would like to see Audience reports, please ensure that you have added '<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />' to your application manifest file. See http://goo.gl/naFqQk for details.
+Interstitials that show when your app is in the background are a violation of AdMob policies and may lead to blocked ad serving. To learn more, visit  https://googlemobileadssdk.page.link/admob-interstitial-policies
+ZInvalid google_app_id. Firebase Analytics disabled. See https://goo.gl/NAOOOI. provided id
+MMissing google_app_id. Firebase Analytics disabled. See https://goo.gl/NAOOOI
+~Missing required android.permission.ACCESS_NETWORK_STATE. Google Analytics disabled. See http://goo.gl/8Rd3yj for instructions
+rMissing required android.permission.INTERNET. Google Analytics disabled. See http://goo.gl/8Rd3yj for instructions
+VPackage in android.resource:// URI not found. Check http://g.co/dev/packagevisibility.
+hPlayer is accessed on the wrong thread. See https://exoplayer.dev/issues/player-accessed-on-wrong-thread
+Please set a valid API key. A Firebase API key is required to communicate with Firebase server APIs: It authenticates your project with Google.Please refer to https://firebase.google.com/support/privacy/init-options.
+Please set your Application ID. A valid Firebase App ID is required to communicate with Firebase server APIs: It identifies your application with Firebase.Please refer to https://firebase.google.com/support/privacy/init-options.
+Please set your Project ID. A valid Firebase Project ID is required to communicate with Firebase server APIs: It identifies your application with Firebase.Please refer to https://firebase.google.com/support/privacy/init-options.
+Rewarded ads that show when your app is in the background are a violation of AdMob policies and may lead to blocked ad serving. To learn more, visit https://googlemobileadssdk.page.link/admob-interstitial-policies
+The provided bindingComponent parameter must be an instance of DataBindingComponent. See  https://issuetracker.google.com/issues/116541301 for details of why this parameter is not defined as DataBindingComponent
+http://
+0http://dashif.org/guidelines/last-segment-number
+&http://dashif.org/guidelines/trickmode
+http://hostname/?
+http://ns.adobe.com/xap/1.0/
+http://play.google.com
+)http://play.google.com/store/apps/details
+'http://schemas.android.com/apk/res-auto
+*http://schemas.android.com/apk/res/android
+)http://schemas.xmlsoap.org/soap/encoding/
+)http://schemas.xmlsoap.org/soap/envelope/
+http://www.example.com
+http://www.google-analytics.com
+http://www.google.com
+http://www.telegram.me/
+#http://www.w3.org/ns/ttml#parameter
+https://
+2https://adc3-launch-staging.adcolony.com/v4/launch
+*https://adc3-launch.adcolony.com/v4/launch
+%https://admob-gmats.uc.r.appspot.com/
+https://aomedia.org/emsg/ID3
+https://api.onesignal.com/
+https://app-measurement.com/a
+https://app-measurement.com/s
+?https://awsdus.api.p3insight.de/isupload/upload_check_lumen.php
+https://csi.gstatic.com/csi
+Khttps://d2to8y50b3n6dq.cloudfront.net/truststores/[PROJECTID]/cdnconfig.zip
+Lhttps://d2to8y50b3n6dq.cloudfront.net/truststores/[PROJECTID]/truststore.zip
+ https://deft.yacinelive.com/api/
+3https://deft.yacinelive.com/api/tw_key?stream_name=
+.https://developer.apple.com/streaming/emsg-id3
+0https://firebaseinstallations.googleapis.com/v1/
+8https://firebaseremoteconfig.googleapis.com/v1/projects/
+@https://firebaseremoteconfigrealtime.googleapis.com/v1/projects/
++https://geoip.api.c0nnectthed0ts.com/geoip/
+%https://geoip.api.p3insight.de/geoip/
+https://google.com/search?
+#https://googleads.g.doubleclick.net
+Nhttps://googleads.g.doubleclick.net/mads/static/mad/sdk/native/native_ads.html
+fhttps://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/mraid/v3/mraid_app_banner.js
+ohttps://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/mraid/v3/mraid_app_expanded_banner.js
+lhttps://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/mraid/v3/mraid_app_interstitial.js
+`https://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/sdk-core-v40-impl.html
+Whttps://googleads.g.doubleclick.net/mads/static/mad/sdk/native/sdk-core-v40-loader.html
+?https://imasdk.googleapis.com/admob/sdkloader/native_video.html
+;https://info.startappservice.com/InApp/resources/info_l.png
+https://m.me/
+9https://pagead2.googlesyndication.com/pagead/ping?e=2&f=1
+https://play.google.com
+.https://play.google.com/store/apps/details?id=
+ https://ssl.google-analytics.com
+:https://support.google.com/dfp_premium/answer/7160685#push
+https://t.me/alamirapp
+https://t.me/dzapk_com_official
+https://twitter.com/#!/
+(https://ul.api.c0nnectthed0ts.com/ul/v3/
+https://wd.adcolony.com/logs
+https://www.facebook.com/
+https://www.google.com
+'https://www.google.com/dfp/debugSignals
+'https://www.google.com/dfp/inAppPreview
+%https://www.google.com/dfp/linkDevice
+(https://www.google.com/dfp/sendDebugData
+Yhttps://www.googleadservices.com/pagead/conversion/app/deeplink?id_type=adid&sdk_version=
+https://www.instagram.com/
+/https://www.startapp.com/policy/privacy-policy/
+parse("http://$uri")
+px; }</style><script>function performClick() { top.location.href = "https://www.startapp.com"; }</script></head><body onclick="performClick()">
+https://imp.startappservice.com/tracking/adImpression
+https://funnel-assets.startappservice.com/consent/index.html
+https://infoevent.startappservice.com/tracking/infoEvent
+https://adsmetadata.startappservice.com/adsmetadata/api/v1.0/
+https://adsmetadata.mobileadexchange.net/adsmetadata/api/v1.0/
+https://d26xw8rp6mlgfg.cloudfront.net/adsmetadata/api/v1.0/
+https://req.startappservice.com/1.5/
